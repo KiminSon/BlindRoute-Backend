@@ -26,6 +26,22 @@ public class TmapService {
         Coordinates startCoordinates = getCoordinates(locations.getStartPoint());
         Coordinates endCoordinates = getCoordinates(locations.getEndPoint());
 
+        String startX = startCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLon();
+        String startY = startCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLat();
+        String endX = endCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLon();
+        String endY = endCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLat();
+
+        String requestBody = String.format("{\"startX\":\"%s\",\"startY\":\"%s\",\"endX\":\"%s\",\"endY\":\"%s\"}", startX, startY, endX, endY);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://apis.openapi.sk.com/transit/routes"))
+                .header("accept", "application/json")
+                .header("content-type", "application/json")
+                .header("appKey", apiKeyConfig.getApiKey())
+                .method("POST", HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+
         return null;
     }
 
