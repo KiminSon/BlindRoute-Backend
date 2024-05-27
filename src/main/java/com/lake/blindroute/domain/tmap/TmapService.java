@@ -26,21 +26,7 @@ public class TmapService {
         Coordinates startCoordinates = getCoordinates(locations.getStartPoint());
         Coordinates endCoordinates = getCoordinates(locations.getEndPoint());
 
-        String startX = startCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLon();
-        String startY = startCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLat();
-        String endX = endCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLon();
-        String endY = endCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLat();
-
-        String requestBody = String.format("{\"startX\":\"%s\",\"startY\":\"%s\",\"endX\":\"%s\",\"endY\":\"%s\"}", startX, startY, endX, endY);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://apis.openapi.sk.com/transit/routes"))
-                .header("accept", "application/json")
-                .header("content-type", "application/json")
-                .header("appKey", apiKeyConfig.getApiKey())
-                .method("POST", HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+        TmapRoute tmapRoute = responseOnlyBus(startCoordinates, endCoordinates);
 
         return null;
     }
@@ -59,5 +45,25 @@ public class TmapService {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper.readValue(response.body(), Coordinates.class);
+    }
+
+    public TmapRoute responseOnlyBus(Coordinates startCoordinates, Coordinates endCoordinates) throws IOException, InterruptedException {
+        String startX = startCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLon();
+        String startY = startCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLat();
+        String endX = endCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLon();
+        String endY = endCoordinates.getSearchPoiInfo().getPois().getPoi().get(0).getFrontLat();
+
+        String requestBody = String.format("{\"startX\":\"%s\",\"startY\":\"%s\",\"endX\":\"%s\",\"endY\":\"%s\"}", startX, startY, endX, endY);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://apis.openapi.sk.com/transit/routes"))
+                .header("accept", "application/json")
+                .header("content-type", "application/json")
+                .header("appKey", apiKeyConfig.getApiKey())
+                .method("POST", HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+
+        return null;
     }
 }
